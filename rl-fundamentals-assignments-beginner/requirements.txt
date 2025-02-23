@@ -1,6 +1,6 @@
 gymnasium # ~=0.28.1
 matplotlib # ~=3.9.2
-moviepy # ~=1.0.3
+moviepy ~=1.0.3
 numpy # ==1.26.4
 pandas # ~=1.5.3
 pipreqs # ~=0.4.13

@@ -2,7 +2,7 @@ import os
 
 import gymnasium as gym
 import numpy as np
-from moviepy.video.compositing.concatenate import concatenate_videoclips
+from moviepy.editor import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 # Define actions
