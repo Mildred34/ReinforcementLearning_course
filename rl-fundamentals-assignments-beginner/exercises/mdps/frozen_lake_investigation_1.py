@@ -37,16 +37,14 @@ def solve_two_by_two():
     # and b is the reward vector. Fill in the elements of the A and b array below (replace the None values).
     # Write elements as a function of the discount factor GAMMA.
     A = np.array([
-        [None, None, None],
-        [None, None, None],
-        [None, None, None],
+        [1-GAMMA/2, -GAMMA/4, -GAMMA/4],
+        [-GAMMA/4, 1-GAMMA/2, 0],
+        [-GAMMA/4, 0, 1-GAMMA/2],
     ])
 
     # Define the reward vector
-    b = np.array([None, None, None])
+    b = np.array([0, 1/4, 1/4])
     # ASSIGNMENT END
-
-
     # Solve the linear system Av = b
     try:
         v = np.linalg.solve(A, b)
@@ -70,15 +68,15 @@ def solve_three_by_three():
     # Only states 0, 1, 2, 4, and 7 are non-terminal, so the matrix is 5x5.
     # Replace the None values with the correct expressions in terms of the discount factor GAMMA.
     A = np.array([
-        [None, None, None, None, None],
-        [None, None, None, None, None],
-        [None, None, None, None, None],
-        [None, None, None, None, None],
-        [None, None, None, None, None],
+        [1-GAMMA/2, -GAMMA/4, 0, 0, 0],
+        [-GAMMA/4, 1-GAMMA/4, -GAMMA/4, -GAMMA/4, 0],
+        [0, -GAMMA/4, 1-GAMMA/2, 0, 0],
+        [0, -GAMMA/4, 0, 1, -GAMMA/4],
+        [0, 0, 0, -GAMMA/4, 1-GAMMA/4],
     ])
 
     # Define the reward vector
-    b = np.array([None, None, None, None, None])
+    b = np.array([0, 0, 0, 0, 1/4])
     # ASSIGNMENT END
 
 

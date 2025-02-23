@@ -4,7 +4,7 @@ from rl.environment.dynamic_programming.jacks_car_rental import JacksCarRental
 from rl.utils.general import set_filepath
 import os
 from rl.algorithms.dynamic_programming.viz import plot_policy_and_value
-
+import time
 
 class PolicyIteration:
     def __init__(self, env: JacksCarRental, gamma: float = 0.9, theta: float = 1e-8) -> None:
@@ -82,7 +82,7 @@ class PolicyIteration:
         while True:
 
             # HOMEWORK: delta <- 0
-            delta: float  = None  # TODO: Implement this assignment
+            delta: float  = 0 
 
             # Efficiently calculate expected returns for all states
             self._update_expected_return_array()
@@ -91,15 +91,15 @@ class PolicyIteration:
                 for state_2 in range(self.max_cars + 1):
 
                     # HOMEWORK: store old value ("v <- V(s)"). c.f. self.value
-                    old_value: float  = None  # TODO: Implement this assignment
+                    old_value: float  = self.value[state_1, state_2]
 
                     # HOMEWORK: retrieve a <- pi(s) as the action to take (deterministic policy). c.f. self.policy
-                    action: int  = None  # TODO: Implement this assignment
+                    action: int  = self.policy[state_1,state_2]
 
                     # HOMEWORK: the environment object has a method that computes the next state given the current state
                     # and the action.
                     # Use this method to compute the next state: next_state = env.compute_next_state(...)
-                    next_state  = None  # TODO: Implement this assignment
+                    next_state  = env.compute_next_state(state=(state_1,state_2),action = action)
 
                     # The next state might be invalid (e.g. if the action is to move more cars than are available).
                     # The environment method returns None in this case, and this control structure skips the rest of the
@@ -112,17 +112,19 @@ class PolicyIteration:
 
                     # HOMEWORK: Use helper function _get_expected_return for this step
                     # This calculates "expected return = sum_{s', r} p(s', r|s, a) [r + gamma V(s')]" efficiently
-                    expected_return: float  = None  # TODO: Implement this assignment
+                    expected_return: float  = self._get_expected_return(state_1_next_morning=next_state_1,state_2_next_morning=next_state_2,action=action)
 
                     # HOMEWORK: V(s) <- expected return
-                    # TODO: Implement this line
+                    self.value[state_1,state_2] = expected_return
 
                     # HOMEWORK: delta <- max(delta, |v - V(s)|)
-                    delta  = None  # TODO: Implement this assignment
+                    delta  = max(delta,abs(old_value-self.value[state_1,state_2]))
 
             # HOMEWORK START: (2 lines)
             # If delta < self.theta, then the value function has converged, and policy evaluation can stop (break loop)
-            pass  # TODO: Implement this section
+            if delta < self.theta :
+                break
+            
             # HOMEWORK END
 
     def policy_improvement(self) -> bool:
@@ -133,7 +135,7 @@ class PolicyIteration:
             bool: True if the policy is stable (no changes), False otherwise.
         """
         # HOMEWORK: policy_stable <- True
-        policy_stable: bool  = None  # TODO: Implement this assignment
+        policy_stable: bool  = True 
 
         # Initialise available actions
         available_actions = np.arange(-self.env.max_move_cars, self.env.max_move_cars + 1)
@@ -143,7 +145,7 @@ class PolicyIteration:
             for state_2 in range(self.max_cars + 1):
 
                 # HOMEWORK: store old action ("old_action <- pi(s)")
-                old_action: int  = None  # TODO: Implement this assignment
+                old_action: int  = self.policy[state_1,state_2]
 
                 # Initialise action_returns for all possible actions
                 # Each element in action_returns corresponds to an action in available_actions (running from
@@ -158,7 +160,7 @@ class PolicyIteration:
                     # HOMEWORK: the environment object has a method that computes the next state given the current state
                     # and the action.
                     # Use this method to compute the next state: next_state = env.compute_next_state(...)
-                    next_state  = None  # TODO: Implement this assignment
+                    next_state  = env.compute_next_state(state=(state_1,state_2),action = action)
 
                     if next_state is None:
                         action_returns.append(-np.inf)    # This ensures invalid actions are never selected by argmax
@@ -169,21 +171,22 @@ class PolicyIteration:
 
                     # HOMEWORK: Use helper function _get_expected_return for this step
                     # This calculates "expected return = sum_{s', r} p(s', r|s, a) [r + gamma V(s')]" efficiently
-                    expected_return: float  = None  # TODO: Implement this assignment
+                    expected_return: float  = self._get_expected_return(state_1_next_morning=next_state_1,state_2_next_morning=next_state_2,action=action)
 
                     # HOMEWORK: Update action_returns list with expected return for this action
-                    # TODO: Implement this line
+                    action_returns.append(expected_return)
 
                 # HOMEWORK: Once all actions have been evaluated, select the best action
                 # (use np.argmax on action_returns to find the index for the best action in available_actions)
-                best_action: int  = None  # TODO: Implement this assignment
+                best_action: int  = np.argmax(action_returns)
 
                 # HOMEWORK: Update policy with best action
-                # TODO: Implement this line
+                self.policy[state_1,state_2] = available_actions[best_action]
 
                 # HOMEWORK START: (2 lines)
                 # If old_action != pi(s), then policy_stable <- False
-                pass  # TODO: Implement this section
+                if old_action != self.policy[state_1,state_2] :
+                    policy_stable = False
                 # HOMEWORK END
 
         return policy_stable
@@ -201,19 +204,20 @@ class PolicyIteration:
             print(f"Policy evaluation: loop {loop}")
 
             # HOMEWORK: Perform policy evaluation
-            # TODO: Implement this line
+            self.policy_evaluation()
 
             self.save_artefacts(save_name=f"policy_evaluation_{loop}")
 
             print(f"Policy improvement: loop {loop}")
 
             # HOMEWORK: Perform policy improvement
-            policy_stable: bool  = None  # TODO: Implement this assignment
+            policy_stable: bool  = self.policy_improvement()
 
             self.save_artefacts(save_name=f"policy_improvement_{loop}")
 
             # HOMEWORK START: (2 lines), if the policy is stable, break the loop (policy iteration is complete)
-            pass  # TODO: Implement this section
+            if policy_stable :
+                break
             # HOMEWORK END
 
             loop += 1
@@ -224,7 +228,11 @@ class PolicyIteration:
 if __name__ == "__main__":
     env = JacksCarRental()
     policy_iteration = PolicyIteration(env)
+    
+    start_time = time.perf_counter()
     policy, value = policy_iteration.policy_iteration()
+    end_time = time.perf_counter()
+    print(f"Temps d'exécution : {end_time - start_time:.6f} secondes")
 
     # Plot the policy and value
     plot_policy_and_value(policy, value)
