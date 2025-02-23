@@ -1,0 +1,10 @@
+rl-fundamentals-assignments-beginner/rl/environment/.data/
+rl-fundamentals-assignments-beginner/rl/algorithms/dynamic_programming/.data/
+rl-fundamentals-assignments-beginner/assignments/.data/
+rl-fundamentals-assignments-beginner/venv/
+rl-fundamentals-assignments-beginner/stitched_videos/
+rl-fundamentals-assignments-beginner/videos/
+/.venv
+/.vscode
+*.pyc
+*.mov
